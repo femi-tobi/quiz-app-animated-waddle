@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'score_page.dart';
 
 class QuizScreen extends StatefulWidget {
   final String name;
@@ -18,57 +19,57 @@ class _QuizScreenState extends State<QuizScreen> {
   bool isAnswered = false;
   String? selectedOption;
 
-  // List of 10 tech-related questions
+  // List of 10 Flutter development questions
   final List<Map<String, dynamic>> questions = [
     {
-      'question': 'In what year did the United States host the FIFA World Cup for the first time?',
-      'options': ['1986', '1994', '2002', '2010'],
-      'answer': '1994',
+      'question': 'What is the primary language used to build Flutter apps?',
+      'options': ['Java', 'Dart', 'Swift', 'Kotlin'],
+      'answer': 'Dart',
     },
     {
-      'question': 'Which programming language is known for its use in Android development?',
-      'options': ['Swift', 'Kotlin', 'Ruby', 'Python'],
-      'answer': 'Kotlin',
+      'question': 'Which widget is used for state management in Flutter?',
+      'options': ['StatefulWidget', 'StatelessWidget', 'Container', 'Text'],
+      'answer': 'StatefulWidget',
     },
     {
-      'question': 'What year was the first iPhone released?',
-      'options': ['2005', '2007', '2009', '2010'],
-      'answer': '2007',
+      'question': 'What tool does Flutter use to compile code to native code?',
+      'options': ['Gradle', 'Xcode', 'Dart SDK', 'Flutter Engine'],
+      'answer': 'Flutter Engine',
     },
     {
-      'question': 'Which company developed the Python programming language?',
-      'options': ['Microsoft', 'Google', 'Python Software Foundation', 'Apple'],
-      'answer': 'Python Software Foundation',
+      'question': 'Which method is called when a Flutter widget is first created?',
+      'options': ['initState', 'build', 'dispose', 'setState'],
+      'answer': 'initState',
     },
     {
-      'question': 'What is the primary language for web development?',
-      'options': ['Java', 'HTML', 'C++', 'PHP'],
-      'answer': 'HTML',
+      'question': 'What is the purpose of the pubspec.yaml file in Flutter?',
+      'options': ['Define app routes', 'Manage dependencies', 'Style the UI', 'Handle state'],
+      'answer': 'Manage dependencies',
     },
     {
-      'question': 'In what year was the first computer bug discovered?',
-      'options': ['1945', '1950', '1960', '1970'],
-      'answer': '1945',
+      'question': 'Which Flutter widget allows scrolling content?',
+      'options': ['ListView', 'Row', 'Column', 'Stack'],
+      'answer': 'ListView',
     },
     {
-      'question': 'Which framework is commonly used for building single-page applications?',
-      'options': ['Django', 'React', 'Flask', 'Laravel'],
-      'answer': 'React',
+      'question': 'What does the setState() method do in Flutter?',
+      'options': ['Updates the UI', 'Fetches data', 'Navigates screens', 'Closes the app'],
+      'answer': 'Updates the UI',
     },
     {
-      'question': 'What does CPU stand for?',
-      'options': ['Central Processing Unit', 'Computer Power Unit', 'Central Program Utility', 'Control Processing Unit'],
-      'answer': 'Central Processing Unit',
+      'question': 'Which package is commonly used for state management in Flutter?',
+      'options': ['http', 'provider', 'path', 'flutter_test'],
+      'answer': 'provider',
     },
     {
-      'question': 'Which company created the Java programming language?',
-      'options': ['Oracle', 'IBM', 'Sun Microsystems', 'Microsoft'],
-      'answer': 'Sun Microsystems',
+      'question': 'What is the default Flutter app entry point?',
+      'options': ['main.dart', 'index.dart', 'app.dart', 'home.dart'],
+      'answer': 'main.dart',
     },
     {
-      'question': 'What year was Git initially released?',
-      'options': ['2005', '2008', '2010', '2012'],
-      'answer': '2005',
+      'question': 'Which command builds a Flutter app for web?',
+      'options': ['flutter run', 'flutter build web', 'flutter pub get', 'flutter doctor'],
+      'answer': 'flutter build web',
     },
   ];
 
@@ -83,6 +84,7 @@ class _QuizScreenState extends State<QuizScreen> {
     isAnswered = false;
     selectedOption = null;
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (!mounted) return;
       setState(() {
         if (timerSeconds > 0 && !isAnswered) {
           timerSeconds--;
@@ -98,7 +100,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void checkAnswer(String option) {
-    if (!isAnswered) {
+    if (!isAnswered && mounted) {
       setState(() {
         isAnswered = true;
         selectedOption = option;
@@ -111,23 +113,28 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void nextQuestion() {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1 && mounted) {
       setState(() {
         currentQuestionIndex++;
         startTimer();
       });
-    } else {
+    } else if (mounted) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ScoreScreen(score: score, total: questions.length, name: widget.name, questions: questions),
+          builder: (context) => ScorePage(
+            name: widget.name,
+            score: score,
+            total: questions.length,
+            questions: questions,
+          ),
         ),
       );
     }
   }
 
   void previousQuestion() {
-    if (currentQuestionIndex > 0) {
+    if (currentQuestionIndex > 0 && mounted) {
       setState(() {
         currentQuestionIndex--;
         startTimer();
@@ -145,7 +152,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color(0xFFF5F5F5), // Light gray background
+        color: Color(0xFFF5F5F5),
         child: Column(
           children: [
             Padding(
@@ -244,80 +251,4 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     );
   }
-}
-
-class ScoreScreen extends StatelessWidget {
-  final int score;
-  final int total;
-  final String name;
-  final List<Map<String, dynamic>> questions;
-
-  ScoreScreen({required this.score, required this.total, required this.name, required this.questions});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: Color(0xFFF5F5F5),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Congratulations, $name!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              Text('Your Score: $score/$total', style: TextStyle(fontSize: 20)),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReviewScreen(questions: questions, score: score),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF004643),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                child: Text('Review Answers', style: TextStyle(fontSize: 18, color: Colors.white)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ReviewScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> questions;
-  final int score;
-
-  ReviewScreen({required this.questions, required this.score});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: Color(0xFFF5F5F5),
-        child: ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: questions.length,
-          itemBuilder: (context, index) {
-            final question = questions[index];
-            final isCorrect = index < score; // Simplified assumption (to be improved with actual user answers)
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: ListTile(
-                title: Text('${index + 1}. ${question['question']}'),
-                subtitle: Text('Answer: ${question['answer']} ${isCorrect ? '(Correct)' : '(Incorrect)'}'),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  } 
 }
