@@ -164,9 +164,15 @@ class _QuizScreenState extends State<QuizScreen> {
                     onPressed: previousQuestion,
                     child: Text('Previous', style: TextStyle(color: Color(0xFF004643), fontSize: 16)),
                   ),
-                  Text(
-                    '${currentQuestionIndex + 1}/${questions.length}',
-                    style: TextStyle(fontSize: 16, color: Color(0xFF004643)),
+                  SizedBox(
+                    width: 200, // Adjust width as needed
+                    child: LinearProgressIndicator(
+                      value: (currentQuestionIndex + 1) / questions.length,
+                      backgroundColor: Colors.grey[300],
+                      color: Color(0xFF2E7D32),
+                      minHeight: 10,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
                   ),
                 ],
               ),
